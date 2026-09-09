@@ -39,6 +39,39 @@ state_change <- tbl(con_seda, "state_scores") |>
 ```
 
 ```{r}
+dist_2023 <- dbplyr_dist |>
+  filter(year == 2023, !is.na(rla_score)) |>
+  collect()
+
+ggplot(dist_2023, aes(x = rla_score)) +
+  geom_histogram(bins = 50, fill = "steelblue", color = "white") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "darkred") +
+  labs(
+    title = "Distribution of District Reading Scores, 2023",
+    subtitle = paste0("n = ", nrow(dist_2023), " districts; most cluster near average, left tail shows the lowest-scoring"),
+    x = "Reading score (grade-equivalents)",
+    y = "Number of districts",
+    caption = "Source: Reardon et al. (2026). Stanford Education Data Archive (SEDA 2025.1)."
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(score_change, aes(x = rla_change)) +
+  geom_histogram(bins = 60, aes(fill = rla_change < 0), show.legend = FALSE) +
+  scale_fill_manual(values = c("TRUE" = "tomato", "FALSE" = "steelblue")) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  labs(
+    title = "Change in District Reading Scores, 2015 to 2023",
+    subtitle = paste0("n = ", nrow(score_change), " districts; about 79% scored lower in 2023 than in 2015"),
+    x = "Score change (grade-equivalents)",
+    y = "Number of districts",
+    caption = "Source: Reardon et al. (2026). Stanford Education Data Archive (SEDA 2025.1)."
+  ) +
+  theme_minimal()
+```
+
+```{r}
 state_change |>
   arrange(rla_2023) |>
   mutate(state_name = fct_inorder(state_name)) |>
